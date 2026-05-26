@@ -19,10 +19,12 @@ import {
   Settings,
   Crown,
   Lock,
+  LogOut,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { auth, signOut } from "@/lib/firebase";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
@@ -40,6 +42,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Sign out error", err);
+    }
+  };
 
   useEffect(() => {
     if (!isLoading) {
@@ -128,6 +140,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   );
                 })}
               </nav>
+              <div className="p-2 border-t border-gold/10">
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all"
+                >
+                  <LogOut size={18} />
+                  Sign Out
+                </button>
+              </div>
             </div>
           </motion.aside>
 
