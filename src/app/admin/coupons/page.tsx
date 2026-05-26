@@ -20,24 +20,7 @@ interface Coupon {
 }
 
 export default function AdminCouponsPage() {
-  const [coupons, setCoupons] = useState<Coupon[]>([
-    {
-      id: "cpn-1",
-      code: "OREN10",
-      type: "percentage",
-      value: 10,
-      minSpend: 50000,
-      expiry: "Dec 31, 2026",
-    },
-    {
-      id: "cpn-2",
-      code: "WELCOME5000",
-      type: "flat",
-      value: 5000,
-      minSpend: 150000,
-      expiry: "Sep 30, 2026",
-    },
-  ]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   const [code, setCode] = useState("");
   const [type, setType] = useState<"percentage" | "flat">("percentage");
@@ -189,34 +172,42 @@ export default function AdminCouponsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {coupons.map((coupon) => (
-                    <tr
-                      key={coupon.id}
-                      className="border-b border-gold/5 last:border-0 hover:bg-gold/5 transition-all"
-                    >
-                      <td className="px-6 py-4 text-sm font-mono font-semibold text-gold">
-                        {coupon.code}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
-                        {coupon.type === "percentage" ? `${coupon.value}% Off` : `₹${coupon.value.toLocaleString()} Off`}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground/50">
-                        ₹{coupon.minSpend.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground/40">
-                        {coupon.expiry}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => handleDelete(coupon.id)}
-                          className="p-1.5 text-foreground/30 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-all"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                  {coupons.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-8 text-center text-sm text-foreground/40">
+                        No discount coupons created yet.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    coupons.map((coupon) => (
+                      <tr
+                        key={coupon.id}
+                        className="border-b border-gold/5 last:border-0 hover:bg-gold/5 transition-all"
+                      >
+                        <td className="px-6 py-4 text-sm font-mono font-semibold text-gold">
+                          {coupon.code}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-foreground">
+                          {coupon.type === "percentage" ? `${coupon.value}% Off` : `₹${coupon.value.toLocaleString()} Off`}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-foreground/50">
+                          ₹{coupon.minSpend.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-foreground/40">
+                          {coupon.expiry}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => handleDelete(coupon.id)}
+                            className="p-1.5 text-foreground/30 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-all"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

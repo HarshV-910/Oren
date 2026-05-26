@@ -20,24 +20,7 @@ interface Banner {
 }
 
 export default function AdminBannersPage() {
-  const [banners, setBanners] = useState<Banner[]>([
-    {
-      id: "ban-1",
-      title: "Celestial Majesty",
-      subtitle: "Experience luxury in diamonds & fine gold",
-      imageUrl: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80",
-      linkUrl: "/products",
-      active: true,
-    },
-    {
-      id: "ban-2",
-      title: "Aurora Radiance",
-      subtitle: "Introducing our new drop earring collection",
-      imageUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80",
-      linkUrl: "/products?category=Earrings",
-      active: true,
-    },
-  ]);
+  const [banners, setBanners] = useState<Banner[]>([]);
 
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
@@ -152,51 +135,61 @@ export default function AdminBannersPage() {
 
         {/* Right List: Banners Cards */}
         <div className="lg:col-span-2 space-y-4">
-          {banners.map((banner) => (
-            <div
-              key={banner.id}
-              className={`glass-card rounded-2xl overflow-hidden border transition-all flex flex-col md:flex-row ${
-                banner.active ? "border-gold/30" : "border-gold/5"
-              }`}
-            >
-              <div className="w-full md:w-48 h-32 md:h-full bg-luxury-charcoal shrink-0 border-r border-gold/5">
-                <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">
-                      {banner.title}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleToggleActive(banner.id)}
-                        className={`p-1 rounded-lg transition-colors ${
-                          banner.active ? "text-emerald-400 hover:text-emerald-500" : "text-foreground/30 hover:text-foreground"
-                        }`}
-                        title={banner.active ? "Set Inactive" : "Set Active"}
-                      >
-                        {banner.active ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(banner.id)}
-                        className="p-1 text-foreground/30 hover:text-red-400 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+          {banners.length === 0 ? (
+            <div className="glass-card rounded-2xl p-8 text-center border border-gold/5">
+              <ImageIcon className="w-10 h-10 text-gold/40 mx-auto mb-4" />
+              <p className="text-sm text-foreground/50">No promotional banners created yet</p>
+              <p className="text-xs text-foreground/30 mt-1">
+                Fill out the form on the left to publish banners to the homepage hero slider.
+              </p>
+            </div>
+          ) : (
+            banners.map((banner) => (
+              <div
+                key={banner.id}
+                className={`glass-card rounded-2xl overflow-hidden border transition-all flex flex-col md:flex-row ${
+                  banner.active ? "border-gold/30" : "border-gold/5"
+                }`}
+              >
+                <div className="w-full md:w-48 h-32 md:h-full bg-luxury-charcoal shrink-0 border-r border-gold/5">
+                  <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-4">
+                      <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">
+                        {banner.title}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleToggleActive(banner.id)}
+                          className={`p-1 rounded-lg transition-colors ${
+                            banner.active ? "text-emerald-400 hover:text-emerald-500" : "text-foreground/30 hover:text-foreground"
+                          }`}
+                          title={banner.active ? "Set Inactive" : "Set Active"}
+                        >
+                          {banner.active ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(banner.id)}
+                          className="p-1 text-foreground/30 hover:text-red-400 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
+                    <p className="text-xs text-foreground/50 mt-1 leading-relaxed">
+                      {banner.subtitle}
+                    </p>
+                    <p className="text-[10px] text-gold/60 font-mono mt-3">
+                      Destination: {banner.linkUrl}
+                    </p>
                   </div>
-                  <p className="text-xs text-foreground/50 mt-1 leading-relaxed">
-                    {banner.subtitle}
-                  </p>
-                  <p className="text-[10px] text-gold/60 font-mono mt-3">
-                    Destination: {banner.linkUrl}
-                  </p>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -51,8 +51,8 @@ export default function AdminDashboard() {
     },
     {
       label: "Total Visitors",
-      value: (12458 + totalOrders * 12).toLocaleString(),
-      change: "+18.7%",
+      value: "0",
+      change: "0%",
       icon: Eye,
       color: "text-purple-400",
     },
