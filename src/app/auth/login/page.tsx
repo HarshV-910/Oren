@@ -34,7 +34,8 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Welcome back!", { description: "Signed in successfully" });
-      window.location.href = "/";
+      const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+      window.location.href = redirectUrl;
     } catch (error: any) {
       toast.error("Login failed", {
         description: error?.message || "Please check your credentials",
@@ -48,7 +49,8 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, googleProvider);
       toast.success("Welcome!", { description: "Signed in with Google" });
-      window.location.href = "/";
+      const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+      window.location.href = redirectUrl;
     } catch (error: any) {
       toast.error("Google sign-in failed", {
         description: error?.message || "Please try again",
@@ -225,7 +227,10 @@ export default function LoginPage() {
           {/* Sign up link */}
           <p className="text-center text-sm text-foreground/40 mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-gold hover:underline">
+            <Link 
+              href={`/auth/signup${typeof window !== "undefined" && window.location.search ? window.location.search : ""}`} 
+              className="text-gold hover:underline"
+            >
               Create Account
             </Link>
           </p>

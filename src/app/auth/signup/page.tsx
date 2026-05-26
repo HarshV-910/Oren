@@ -45,7 +45,8 @@ export default function SignupPage() {
       toast.success("Account created!", {
         description: "Welcome to the world of Oren luxury",
       });
-      window.location.href = "/";
+      const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+      window.location.href = redirectUrl;
     } catch (error: any) {
       toast.error("Registration failed", {
         description: error?.message || "Please try again",
@@ -61,7 +62,8 @@ export default function SignupPage() {
       toast.success("Welcome to Oren!", {
         description: "Signed up with Google",
       });
-      window.location.href = "/";
+      const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+      window.location.href = redirectUrl;
     } catch (error: any) {
       toast.error("Google sign-up failed", {
         description: error?.message || "Please try again",
@@ -211,7 +213,10 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-foreground/40 mt-6">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-gold hover:underline">
+            <Link 
+              href={`/auth/login${typeof window !== "undefined" && window.location.search ? window.location.search : ""}`} 
+              className="text-gold hover:underline"
+            >
               Sign In
             </Link>
           </p>

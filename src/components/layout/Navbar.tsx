@@ -22,6 +22,9 @@ import {
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useUIStore } from "@/store/useUIStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { auth, onAuthStateChanged } from "@/lib/firebase";
+
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -48,12 +51,36 @@ export default function Navbar() {
   const { isMobileMenuOpen, setMobileMenu, setSearchOpen, setChatOpen } = useUIStore();
   const cartCount = useCartStore((s) => s.getItemCount());
   const wishlistCount = useWishlistStore((s) => s.items.length);
+  const { user, setUser } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "harshvekariya910@gmail.com";
+        setUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || "",
+          full_name: firebaseUser.displayName || "Valued Client",
+          phone: firebaseUser.phoneNumber || undefined,
+          avatar_url: firebaseUser.photoURL || undefined,
+          role: firebaseUser.email === adminEmail ? "admin" : "user",
+          language: "en",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [setUser]);
 
   return (
     <>
@@ -188,7 +215,13 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/auth/login"
+                href={
+                  user
+                    ? user.role === "admin"
+                      ? "/admin"
+                      : "/account"
+                    : "/auth/login"
+                }
                 className="p-2 text-foreground/70 hover:text-gold transition-colors"
                 aria-label="Account"
               >
@@ -268,27 +301,41 @@ export default function Navbar() {
                 <div className="divider-gold my-6" />
 
                 <div className="space-y-1">
-                  <Link
-                    href="/auth/login"
-                    onClick={() => setMobileMenu(false)}
-                    className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
-                  >
-                    Sign In / Register
-                  </Link>
-                  <Link
-                    href="/account"
-                    onClick={() => setMobileMenu(false)}
-                    className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
-                  >
-                    My Account
-                  </Link>
-                  <Link
-                    href="/account/orders"
-                    onClick={() => setMobileMenu(false)}
-                    className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
-                  >
-                    My Orders
-                  </Link>
+                  {!user ? (
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setMobileMenu(false)}
+                      className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
+                    >
+                      Sign In / Register
+                    </Link>
+                  ) : (
+                    <>
+                      {user.role === "admin" && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setMobileMenu(false)}
+                          className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <Link
+                        href="/account"
+                        onClick={() => setMobileMenu(false)}
+                        className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
+                      >
+                        My Account
+                      </Link>
+                      <Link
+                        href="/account/orders"
+                        onClick={() => setMobileMenu(false)}
+                        className="block py-3 px-4 text-foreground/80 hover:text-gold rounded-lg transition-all"
+                      >
+                        My Orders
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

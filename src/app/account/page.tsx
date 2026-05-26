@@ -18,6 +18,10 @@ import {
   Crown,
 } from "lucide-react";
 
+import { useAuthStore } from "@/store/useAuthStore";
+import { auth, signOut } from "@/lib/firebase";
+import { useEffect } from "react";
+
 const menuItems = [
   { icon: ShoppingBag, label: "My Orders", href: "/account/orders", count: 3 },
   { icon: Heart, label: "Wishlist", href: "/account/wishlist", count: 5 },
@@ -45,6 +49,36 @@ const recentOrders = [
 ];
 
 export default function AccountPage() {
+  const { user, isAuthenticated, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/auth/login?redirect=/account";
+    }
+  }, [isLoading, isAuthenticated]);
+
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Sign out error", err);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="pt-40 pb-20 min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Redirecting...
+  }
+
   return (
     <div className="pt-32 pb-20 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,23 +89,29 @@ export default function AccountPage() {
           className="glass-card rounded-3xl p-8 mb-8"
         >
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-20 h-20 rounded-full gradient-gold flex items-center justify-center text-luxury-black">
-              <User size={32} />
+            <div className="w-20 h-20 rounded-full gradient-gold flex items-center justify-center text-luxury-black font-semibold text-2xl uppercase">
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt={user.full_name} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                user.full_name.charAt(0)
+              )}
             </div>
             <div className="text-center sm:text-left flex-1">
-              <h1 className="text-2xl font-display font-bold text-foreground">Welcome Back</h1>
-              <p className="text-foreground/40 text-sm">guest@oren.com</p>
+              <h1 className="text-2xl font-display font-bold text-foreground">{user.full_name}</h1>
+              <p className="text-foreground/40 text-sm">{user.email}</p>
               <div className="flex items-center gap-2 mt-2 justify-center sm:justify-start">
                 <Crown className="w-4 h-4 text-gold" />
-                <span className="text-xs text-gold">Gold Member</span>
+                <span className="text-xs text-gold">
+                  {user.role === "admin" ? "Admin Access" : "Gold Member"}
+                </span>
               </div>
             </div>
-            <Link
-              href="/auth/login"
+            <button
+              onClick={handleSignOut}
               className="flex items-center gap-2 text-sm text-foreground/40 hover:text-gold transition-colors"
             >
               <LogOut size={16} /> Sign Out
-            </Link>
+            </button>
           </div>
         </motion.div>
 

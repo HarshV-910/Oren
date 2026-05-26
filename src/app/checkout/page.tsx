@@ -22,11 +22,13 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "razorpay">("stripe");
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   const subtotal = getTotal();
   const shipping = subtotal > 50000 ? 0 : 500;
@@ -39,6 +41,46 @@ export default function CheckoutPage() {
     });
     clearCart();
   };
+
+  if (isLoading) {
+    return (
+      <div className="pt-40 pb-20 min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="pt-40 pb-20 min-h-screen flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card max-w-md w-full p-8 text-center rounded-3xl"
+        >
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 bg-gold/10">
+            <Lock className="w-8 h-8 text-gold" />
+          </div>
+          <h2 className="text-2xl font-display font-bold text-foreground mb-3">
+            Secure Checkout
+          </h2>
+          <p className="text-sm text-foreground/50 mb-8 leading-relaxed">
+            To proceed with your luxury purchase, please sign in or register an account.
+          </p>
+          <Link href="/auth/login?redirect=/checkout">
+            <Button className="w-full btn-luxury py-6 text-sm font-semibold uppercase tracking-wider">
+              Sign In to Continue
+            </Button>
+          </Link>
+          <div className="mt-6">
+            <Link href="/products" className="text-xs text-foreground/40 hover:text-gold hover:underline">
+              ← Return to Shopping
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
