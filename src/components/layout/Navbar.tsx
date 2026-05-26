@@ -25,6 +25,7 @@ import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { auth, onAuthStateChanged } from "@/lib/firebase";
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 
 const navLinks = [
@@ -54,6 +55,7 @@ export default function Navbar() {
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const { user, setUser } = useAuthStore();
   const announcementText = useAnnouncementStore((s) => s.text);
+  const storeName = useSettingsStore((s) => s.storeName);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -115,8 +117,8 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <Crown className="w-8 h-8 text-gold group-hover:animate-pulse-gold transition-all" />
-              <span className="text-2xl lg:text-3xl font-display font-bold gradient-gold-text tracking-wider">
-                OREN
+              <span className="text-2xl lg:text-3xl font-display font-bold gradient-gold-text tracking-wider uppercase">
+                {storeName}
               </span>
             </Link>
 

@@ -25,8 +25,8 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
-
 import { useOrderStore, type OrderLocal } from "@/store/useOrderStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
@@ -35,6 +35,7 @@ export default function CheckoutPage() {
   const { isAuthenticated, isLoading } = useAuthStore();
   const addOrder = useOrderStore((s) => s.addOrder);
   const [placedOrder, setPlacedOrder] = useState<OrderLocal | null>(null);
+  const { storeName, contactEmail, phone: storePhone } = useSettingsStore();
 
   // Shipping Address States
   const [fullName, setFullName] = useState("");
@@ -289,8 +290,8 @@ export default function CheckoutPage() {
 
             {/* Footer */}
             <div className="mt-12 text-center border-t border-gold/5 pt-6 text-[10px] text-foreground/30 leading-relaxed print-border-dark print-text-dark">
-              <p>Oren Luxury Jewellery Collections — Handcrafted Elegance.</p>
-              <p className="mt-1">For support, please contact us at support@oren.com or call our helpline +91 1800 123 4567.</p>
+              <p>{storeName} Luxury Jewellery Collections — Handcrafted Elegance.</p>
+              <p className="mt-1">For support, please contact us at {contactEmail} or call our helpline {storePhone}.</p>
             </div>
           </div>
 

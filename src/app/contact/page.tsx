@@ -20,31 +20,34 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-
-const contactInfo = [
-  {
-    icon: MapPin,
-    title: "Visit Us",
-    details: ["Oren Luxury Jewellers", "Zaveri Bazaar, Mumbai", "Maharashtra, India 400002"],
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    details: ["+91 98765 43210", "+91 22 2567 8901", "Toll Free: 1800-XXX-XXXX"],
-  },
-  {
-    icon: Mail,
-    title: "Email Us",
-    details: ["hello@oren.com", "support@oren.com", "orders@oren.com"],
-  },
-  {
-    icon: Clock,
-    title: "Working Hours",
-    details: ["Mon - Sat: 10AM - 8PM", "Sunday: 11AM - 6PM", "Holidays: Closed"],
-  },
-];
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function ContactPage() {
+  const { storeName, contactEmail, phone, address } = useSettingsStore();
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: "Visit Us",
+      details: [`${storeName} Luxury Jewellers`, address, "Maharashtra, India 400002"],
+    },
+    {
+      icon: Phone,
+      title: "Call Us",
+      details: [phone, "+91 22 2567 8901", "Toll Free: 1800-XXX-XXXX"],
+    },
+    {
+      icon: Mail,
+      title: "Email Us",
+      details: [contactEmail, `support@${storeName.toLowerCase().replace(/\s+/g, '')}.com`, `orders@${storeName.toLowerCase().replace(/\s+/g, '')}.com`],
+    },
+    {
+      icon: Clock,
+      title: "Working Hours",
+      details: ["Mon - Sat: 10AM - 8PM", "Sunday: 11AM - 6PM", "Holidays: Closed"],
+    },
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",

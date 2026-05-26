@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 const footerLinks = {
   shop: [
@@ -59,6 +60,8 @@ const trustBadges = [
 ];
 
 export default function Footer() {
+  const { storeName, contactEmail, phone, address } = useSettingsStore();
+
   return (
     <footer className="relative bg-luxury-dark border-t border-gold/10">
       {/* Trust Badges */}
@@ -91,8 +94,8 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Crown className="w-8 h-8 text-gold" />
-              <span className="text-2xl font-display font-bold gradient-gold-text tracking-wider">
-                OREN
+              <span className="text-2xl font-display font-bold gradient-gold-text tracking-wider uppercase">
+                {storeName}
               </span>
             </Link>
             <p className="text-foreground/50 text-sm leading-relaxed mb-6">
@@ -145,7 +148,7 @@ export default function Footer() {
         <div className="mt-16 pt-10 border-t border-gold/10">
           <div className="max-w-xl mx-auto text-center">
             <h3 className="text-lg font-display font-semibold gradient-gold-text mb-2">
-              Join the Oren Circle
+              Join the {storeName} Circle
             </h3>
             <p className="text-sm text-foreground/50 mb-4">
               Be the first to discover new collections, exclusive offers, and luxury insights.
@@ -167,17 +170,17 @@ export default function Footer() {
         <div className="mt-10 pt-8 border-t border-gold/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-foreground/40">
             <span className="flex items-center gap-1.5">
-              <MapPin size={14} /> Mumbai, India
+              <MapPin size={14} /> {address}
             </span>
             <span className="flex items-center gap-1.5">
-              <Phone size={14} /> +91 98765 43210
+              <Phone size={14} /> {phone}
             </span>
             <span className="flex items-center gap-1.5">
-              <Mail size={14} /> hello@oren.com
+              <Mail size={14} /> {contactEmail}
             </span>
           </div>
           <p className="text-xs text-foreground/30">
-            © {new Date().getFullYear()} Oren Luxury Jewellery. All rights reserved.
+            © {new Date().getFullYear()} {storeName} Luxury Jewellery. All rights reserved.
           </p>
         </div>
       </div>

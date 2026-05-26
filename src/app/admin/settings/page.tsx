@@ -12,11 +12,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 import { useGuideStore } from "@/store/useGuideStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function AdminSettingsPage() {
-  const [storeName, setStoreName] = useState("Oren");
-  const [contactEmail, setContactEmail] = useState("support@oren.com");
-  const [phone, setPhone] = useState("+91 1800 123 4567");
+  const {
+    storeName: initialStoreName,
+    contactEmail: initialContactEmail,
+    phone: initialPhone,
+    setStoreName: updateStoreName,
+    setContactEmail: updateContactEmail,
+    setPhone: updatePhone,
+  } = useSettingsStore();
+
+  const [storeName, setStoreName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [maintenance, setMaintenance] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -33,15 +43,21 @@ export default function AdminSettingsPage() {
   const [careGuideText, setCareGuideText] = useState("");
 
   useEffect(() => {
+    setStoreName(initialStoreName);
+    setContactEmail(initialContactEmail);
+    setPhone(initialPhone);
     setAnnouncementText(storeAnnouncement);
     setSizeGuideText(storeSizeGuide);
     setCareGuideText(storeCareGuide);
-  }, [storeAnnouncement, storeSizeGuide, storeCareGuide]);
+  }, [initialStoreName, initialContactEmail, initialPhone, storeAnnouncement, storeSizeGuide, storeCareGuide]);
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setTimeout(() => {
+      updateStoreName(storeName);
+      updateContactEmail(contactEmail);
+      updatePhone(phone);
       storeSetAnnouncement(announcementText);
       storeSetSizeGuide(sizeGuideText);
       storeSetCareGuide(careGuideText);
