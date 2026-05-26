@@ -36,15 +36,13 @@ const footerLinks = {
   company: [
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
-    { name: "Careers", href: "#" },
-    { name: "Press", href: "#" },
   ],
   support: [
     { name: "FAQ", href: "#" },
     { name: "Shipping", href: "#" },
     { name: "Returns", href: "#" },
-    { name: "Size Guide", href: "#" },
-    { name: "Care Guide", href: "#" },
+    { name: "Size Guide", href: "/size-guide" },
+    { name: "Care Guide", href: "/care-guide" },
   ],
   legal: [
     { name: "Privacy Policy", href: "#" },

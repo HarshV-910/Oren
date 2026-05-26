@@ -8,8 +8,10 @@ import { useState, useEffect } from "react";
 import { Settings, Save, ShieldAlert, Globe, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
+import { useGuideStore } from "@/store/useGuideStore";
 
 export default function AdminSettingsPage() {
   const [storeName, setStoreName] = useState("Oren");
@@ -22,15 +24,27 @@ export default function AdminSettingsPage() {
   const storeSetAnnouncement = useAnnouncementStore((s) => s.setText);
   const [announcementText, setAnnouncementText] = useState("");
 
+  const storeSizeGuide = useGuideStore((s) => s.sizeGuide);
+  const storeCareGuide = useGuideStore((s) => s.careGuide);
+  const storeSetSizeGuide = useGuideStore((s) => s.setSizeGuide);
+  const storeSetCareGuide = useGuideStore((s) => s.setCareGuide);
+
+  const [sizeGuideText, setSizeGuideText] = useState("");
+  const [careGuideText, setCareGuideText] = useState("");
+
   useEffect(() => {
     setAnnouncementText(storeAnnouncement);
-  }, [storeAnnouncement]);
+    setSizeGuideText(storeSizeGuide);
+    setCareGuideText(storeCareGuide);
+  }, [storeAnnouncement, storeSizeGuide, storeCareGuide]);
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setTimeout(() => {
       storeSetAnnouncement(announcementText);
+      storeSetSizeGuide(sizeGuideText);
+      storeSetCareGuide(careGuideText);
       setSaving(false);
       toast.success("System configurations updated successfully! ⚙️");
     }, 800);
@@ -94,6 +108,26 @@ export default function AdminSettingsPage() {
                   value={announcementText}
                   onChange={(e) => setAnnouncementText(e.target.value)}
                   className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">Size Guide Page Content (Markdown supported)</label>
+                <Textarea
+                  value={sizeGuideText}
+                  onChange={(e) => setSizeGuideText(e.target.value)}
+                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40 h-40 font-mono text-xs"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">Care Guide Page Content (Markdown supported)</label>
+                <Textarea
+                  value={careGuideText}
+                  onChange={(e) => setCareGuideText(e.target.value)}
+                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40 h-40 font-mono text-xs"
                   required
                 />
               </div>
