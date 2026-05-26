@@ -18,6 +18,7 @@ import {
   googleProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "@/lib/firebase";
 
 export default function SignupPage() {
@@ -41,7 +42,12 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, {
+          displayName: fullName,
+        });
+      }
       toast.success("Account created!", {
         description: "Welcome to the world of Oren luxury",
       });

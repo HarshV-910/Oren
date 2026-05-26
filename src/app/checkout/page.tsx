@@ -24,11 +24,23 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 
+import { useOrderStore } from "@/store/useOrderStore";
+
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "razorpay">("stripe");
   const { isAuthenticated, isLoading } = useAuthStore();
+  const addOrder = useOrderStore((s) => s.addOrder);
+
+  // Shipping Address States
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [addressLine, setAddressLine] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("India");
 
   const subtotal = getTotal();
   const shipping = subtotal > 50000 ? 0 : 500;
@@ -36,10 +48,37 @@ export default function CheckoutPage() {
   const total = subtotal + shipping + tax;
 
   const handlePlaceOrder = () => {
+    const order = addOrder({
+      items,
+      subtotal,
+      tax,
+      shipping,
+      total,
+      paymentMethod,
+      address: {
+        fullName,
+        phone,
+        addressLine,
+        city,
+        state,
+        postalCode,
+        country,
+      },
+    });
+
     toast.success("Order placed successfully! 🎉", {
-      description: `Order total: ${formatPrice(total)}`,
+      description: `Order ${order.order_number} total: ${formatPrice(total)}`,
     });
     clearCart();
+    window.location.href = "/account/orders";
+  };
+
+  const handleContinueToPayment = () => {
+    if (!fullName || !phone || !addressLine || !city || !state || !postalCode || !country) {
+      toast.error("Please fill in all shipping address fields");
+      return;
+    }
+    setStep(2);
   };
 
   if (isLoading) {
@@ -146,36 +185,71 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">Full Name</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="Your full name" />
+                    <Input 
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="Your full name" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">Phone</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="+91 XXXXX XXXXX" />
+                    <Input 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="+91 XXXXX XXXXX" 
+                    />
                   </div>
                   <div className="sm:col-span-2">
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">Address</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="Street address" />
+                    <Input 
+                      value={addressLine}
+                      onChange={(e) => setAddressLine(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="Street address" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">City</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="City" />
+                    <Input 
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="City" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">State</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="State" />
+                    <Input 
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="State" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">Postal Code</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="400001" />
+                    <Input 
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="400001" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-foreground/50 uppercase tracking-wider">Country</Label>
-                    <Input className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" placeholder="India" />
+                    <Input 
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                      placeholder="India" 
+                    />
                   </div>
                 </div>
 
                 <Button
-                  onClick={() => setStep(2)}
+                  onClick={handleContinueToPayment}
                   className="btn-luxury mt-6 px-8 py-5 text-sm font-semibold uppercase tracking-wider"
                 >
                   Continue to Payment

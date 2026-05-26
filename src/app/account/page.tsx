@@ -21,35 +21,23 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { auth, signOut } from "@/lib/firebase";
 import { useEffect } from "react";
-
-const menuItems = [
-  { icon: ShoppingBag, label: "My Orders", href: "/account/orders", count: 3 },
-  { icon: Heart, label: "Wishlist", href: "/account/wishlist", count: 5 },
-  { icon: MapPin, label: "Addresses", href: "/account/addresses" },
-  { icon: Settings, label: "Settings", href: "/account/settings" },
-];
-
-const recentOrders = [
-  {
-    id: "ORN-2024-001",
-    product: "Celestial Diamond Solitaire Ring",
-    date: "Dec 15, 2024",
-    status: "Delivered",
-    total: "₹2,85,000",
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&q=80",
-  },
-  {
-    id: "ORN-2024-002",
-    product: "Aurora Diamond Drop Earrings",
-    date: "Dec 10, 2024",
-    status: "Shipped",
-    total: "₹1,65,000",
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=200&q=80",
-  },
-];
+import { useOrderStore } from "@/store/useOrderStore";
+import { useWishlistStore } from "@/store/useWishlistStore";
+import { formatPrice } from "@/lib/data";
 
 export default function AccountPage() {
   const { user, isAuthenticated, isLoading } = useAuthStore();
+  const orders = useOrderStore((s) => s.orders);
+  const wishlistCount = useWishlistStore((s) => s.items.length);
+
+  const menuItems = [
+    { icon: ShoppingBag, label: "My Orders", href: "/account/orders", count: orders.length },
+    { icon: Heart, label: "Wishlist", href: "/account/wishlist", count: wishlistCount },
+    { icon: MapPin, label: "Addresses", href: "/account/addresses" },
+    { icon: Settings, label: "Settings", href: "/account/settings" },
+  ];
+
+  const recentOrders = orders.slice(0, 2);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -159,39 +147,61 @@ export default function AccountPage() {
               Recent Orders
             </h2>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="glass-card rounded-2xl p-5 flex gap-4">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-luxury-charcoal shrink-0">
-                    <img
-                      src={order.image}
-                      alt={order.product}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {order.product}
-                        </p>
-                        <p className="text-xs text-foreground/40 mt-0.5">
-                          {order.id} • {order.date}
+              {recentOrders.length === 0 ? (
+                <div className="glass-card rounded-2xl p-8 text-center border border-gold/5">
+                  <Package className="w-10 h-10 text-gold/40 mx-auto mb-4" />
+                  <p className="text-sm text-foreground/50">No recent orders found</p>
+                  <p className="text-xs text-foreground/30 mt-1">
+                    Your luxury collection order history will appear here.
+                  </p>
+                </div>
+              ) : (
+                recentOrders.map((order) => {
+                  const firstItem = order.items[0];
+                  const displayTitle = firstItem
+                    ? order.items.length > 1
+                      ? `${firstItem.product.name} + ${order.items.length - 1} more`
+                      : firstItem.product.name
+                    : "Luxury Order";
+                  const displayImage = firstItem?.product.images[0] || "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&q=80";
+
+                  return (
+                    <div key={order.id} className="glass-card rounded-2xl p-5 flex gap-4">
+                      <div className="w-16 h-16 rounded-xl overflow-hidden bg-luxury-charcoal shrink-0 border border-gold/5">
+                        <img
+                          src={displayImage}
+                          alt={displayTitle}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-foreground truncate">
+                              {displayTitle}
+                            </p>
+                            <p className="text-xs text-foreground/40 mt-0.5 font-mono">
+                              {order.order_number} • {order.date}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wider uppercase ${
+                              order.status === "Delivered"
+                                ? "bg-emerald-500/15 text-emerald-400"
+                                : "bg-gold/15 text-gold"
+                            }`}
+                          >
+                            {order.status}
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold gradient-gold-text mt-2">
+                          {formatPrice(order.total)}
                         </p>
                       </div>
-                      <span
-                        className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${
-                          order.status === "Delivered"
-                            ? "bg-emerald-500/15 text-emerald-400"
-                            : "bg-blue-500/15 text-blue-400"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
                     </div>
-                    <p className="text-sm font-semibold gradient-gold-text mt-2">{order.total}</p>
-                  </div>
-                </div>
-              ))}
+                  );
+                })
+              )}
             </div>
 
             <Link
