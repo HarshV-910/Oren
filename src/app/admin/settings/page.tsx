@@ -19,9 +19,11 @@ export default function AdminSettingsPage() {
     storeName: initialStoreName,
     contactEmail: initialContactEmail,
     phone: initialPhone,
+    maintenance: initialMaintenance,
     setStoreName: updateStoreName,
     setContactEmail: updateContactEmail,
     setPhone: updatePhone,
+    setMaintenance: updateMaintenance,
   } = useSettingsStore();
 
   const [storeName, setStoreName] = useState("");
@@ -46,10 +48,11 @@ export default function AdminSettingsPage() {
     setStoreName(initialStoreName);
     setContactEmail(initialContactEmail);
     setPhone(initialPhone);
+    setMaintenance(initialMaintenance);
     setAnnouncementText(storeAnnouncement);
     setSizeGuideText(storeSizeGuide);
     setCareGuideText(storeCareGuide);
-  }, [initialStoreName, initialContactEmail, initialPhone, storeAnnouncement, storeSizeGuide, storeCareGuide]);
+  }, [initialStoreName, initialContactEmail, initialPhone, initialMaintenance, storeAnnouncement, storeSizeGuide, storeCareGuide]);
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +61,7 @@ export default function AdminSettingsPage() {
       updateStoreName(storeName);
       updateContactEmail(contactEmail);
       updatePhone(phone);
+      updateMaintenance(maintenance);
       storeSetAnnouncement(announcementText);
       storeSetSizeGuide(sizeGuideText);
       storeSetCareGuide(careGuideText);
@@ -177,11 +181,13 @@ export default function AdminSettingsPage() {
                 type="checkbox"
                 checked={maintenance}
                 onChange={(e) => {
-                  setMaintenance(e.target.checked);
+                  const val = e.target.checked;
+                  setMaintenance(val);
+                  updateMaintenance(val);
                   toast.success(
-                    e.target.checked
-                      ? "Maintenance mode scheduled"
-                      : "Maintenance mode disabled"
+                    val
+                      ? "Maintenance mode activated site-wide! 🛠️"
+                      : "Maintenance mode deactivated! ✨"
                   );
                 }}
                 className="rounded border-red-500/30 bg-white/5 text-red-500 focus:ring-0 focus:ring-offset-0 w-4 h-4 cursor-pointer"

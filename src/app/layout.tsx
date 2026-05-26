@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import SearchOverlay from "@/components/layout/SearchOverlay";
+import MaintenanceGuard from "@/components/layout/MaintenanceGuard";
 // import ChatBot from "@/components/ai/ChatBot"; // Disabled: Gemini API quota exceeded
 import "./globals.css";
 
@@ -69,10 +67,9 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
         <TooltipProvider>
-          <Navbar />
-          <SearchOverlay />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <MaintenanceGuard>
+            {children}
+          </MaintenanceGuard>
           {/* <ChatBot /> */}{/* Disabled: Gemini API quota exceeded — re-enable when you have a working API key */}
           <Toaster
             position="top-right"
