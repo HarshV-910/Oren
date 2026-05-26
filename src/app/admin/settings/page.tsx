@@ -4,11 +4,12 @@
 // OREN — Admin Settings Page
 // ═══════════════════════════════════════════════════════
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, Save, ShieldAlert, Globe, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 
 export default function AdminSettingsPage() {
   const [storeName, setStoreName] = useState("Oren");
@@ -17,10 +18,19 @@ export default function AdminSettingsPage() {
   const [maintenance, setMaintenance] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const storeAnnouncement = useAnnouncementStore((s) => s.text);
+  const storeSetAnnouncement = useAnnouncementStore((s) => s.setText);
+  const [announcementText, setAnnouncementText] = useState("");
+
+  useEffect(() => {
+    setAnnouncementText(storeAnnouncement);
+  }, [storeAnnouncement]);
+
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setTimeout(() => {
+      storeSetAnnouncement(announcementText);
       setSaving(false);
       toast.success("System configurations updated successfully! ⚙️");
     }, 800);
@@ -73,6 +83,16 @@ export default function AdminSettingsPage() {
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">Header Announcement Banner Text</label>
+                <Input
+                  value={announcementText}
+                  onChange={(e) => setAnnouncementText(e.target.value)}
                   className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
                   required
                 />

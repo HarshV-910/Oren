@@ -24,6 +24,7 @@ import { useWishlistStore } from "@/store/useWishlistStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { auth, onAuthStateChanged } from "@/lib/firebase";
+import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 
 
 const navLinks = [
@@ -52,6 +53,7 @@ export default function Navbar() {
   const cartCount = useCartStore((s) => s.getItemCount());
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const { user, setUser } = useAuthStore();
+  const announcementText = useAnnouncementStore((s) => s.text);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -86,7 +88,7 @@ export default function Navbar() {
     <>
       {/* Top announcement bar */}
       <div className="bg-gold/90 text-luxury-black text-center py-1.5 text-xs font-medium tracking-wider">
-        ✨ FREE WORLDWIDE SHIPPING ON ORDERS ABOVE ₹50,000 | USE CODE: OREN10 FOR 10% OFF ✨
+        {announcementText}
       </div>
 
       <motion.header
