@@ -135,16 +135,6 @@ export default function AdminSettingsPage() {
 
   return (
     <div>
-      {/* Navigation */}
-      <div className="mb-6 flex justify-between items-center">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs text-foreground/45 hover:text-gold uppercase tracking-wider transition-colors font-medium"
-        >
-          <ArrowLeft size={14} /> Back to Storefront
-        </Link>
-      </div>
-
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-display font-bold gradient-gold-text">

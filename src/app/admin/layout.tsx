@@ -20,6 +20,7 @@ import {
   Crown,
   Lock,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
@@ -109,6 +110,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             animate={{ opacity: 1, x: 0 }}
             className="lg:w-64 shrink-0"
           >
+            {/* Back to Storefront Link */}
+            <div className="mb-4 pl-2">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-gold/75 hover:text-gold uppercase tracking-wider transition-colors"
+              >
+                <ArrowLeft size={14} /> Back to Storefront
+              </Link>
+            </div>
             <div className="glass-card rounded-2xl overflow-hidden lg:sticky lg:top-32">
               <div className="p-5 border-b border-gold/10">
                 <div className="flex items-center gap-3">
