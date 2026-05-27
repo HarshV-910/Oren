@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useCouponStore } from "@/store/useCouponStore";
+import { translate } from "@/lib/translations";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useOrderStore, type OrderLocal } from "@/store/useOrderStore";
@@ -363,7 +364,7 @@ export default function CheckoutPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-display font-bold gradient-gold-text mb-3"
         >
-          Checkout
+          {translate("checkout.title", "Checkout")}
         </motion.h1>
 
         {/* Steps */}
@@ -401,31 +402,31 @@ export default function CheckoutPage() {
                 <div className="flex items-center gap-3 mb-6">
                   <MapPin className="text-gold" size={20} />
                   <h2 className="text-lg font-display font-semibold text-foreground">
-                    Shipping Address
+                    {translate("checkout.shipping_address", "Shipping Address")}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">Full Name</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.full_name", "Full Name")}</Label>
                     <Input 
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
-                      placeholder="Your full name" 
+                       value={fullName}
+                       onChange={(e) => setFullName(e.target.value)}
+                       className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                       placeholder="Your full name" 
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">Phone</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.phone", "Phone")}</Label>
                     <Input 
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
-                      placeholder="+91 XXXXX XXXXX" 
+                       value={phone}
+                       onChange={(e) => setPhone(e.target.value)}
+                       className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40" 
+                       placeholder="+91 XXXXX XXXXX" 
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">Address</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.address", "Address")}</Label>
                     <Input 
                       value={addressLine}
                       onChange={(e) => setAddressLine(e.target.value)}
@@ -434,7 +435,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">City</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.city", "City")}</Label>
                     <Input 
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
@@ -443,7 +444,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">State</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.state", "State")}</Label>
                     <Input 
                       value={state}
                       onChange={(e) => setState(e.target.value)}
@@ -452,7 +453,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">Postal Code</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.postal", "Postal Code")}</Label>
                     <Input 
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
@@ -461,7 +462,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">Country</Label>
+                    <Label className="text-xs text-foreground/50 uppercase tracking-wider">{translate("checkout.country", "Country")}</Label>
                     <Input 
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
@@ -490,7 +491,7 @@ export default function CheckoutPage() {
                 <div className="flex items-center gap-3 mb-6">
                   <CreditCard className="text-gold" size={20} />
                   <h2 className="text-lg font-display font-semibold text-foreground">
-                    Payment Method
+                    {translate("checkout.payment_method", "Payment Method")}
                   </h2>
                 </div>
 
@@ -548,7 +549,7 @@ export default function CheckoutPage() {
                       COD
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-medium text-foreground">Cash on Delivery (COD)</p>
+                      <p className="text-sm font-medium text-foreground">{translate("checkout.payment_cod", "Cash on Delivery (COD)")}</p>
                       <p className="text-[10px] text-foreground/40">
                         Pay with cash upon package delivery
                       </p>
@@ -619,12 +620,12 @@ export default function CheckoutPage() {
                   >
                     Back
                   </Button>
-                  <Button
+                   <Button
                     onClick={handlePlaceOrder}
                     className="btn-luxury px-8 py-5 text-sm font-semibold uppercase tracking-wider flex-1"
                   >
                     <Shield size={16} className="mr-2" />
-                    Place Order — {formatPrice(total)}
+                    {translate("checkout.place_order", "Place Order")} — {formatPrice(total)}
                   </Button>
                 </div>
               </motion.div>
@@ -634,31 +635,31 @@ export default function CheckoutPage() {
           {/* Order Summary Sidebar */}
           <div>
             <div className="glass-card rounded-2xl p-6 sticky top-32">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Order Summary</h3>
+               <h3 className="text-sm font-semibold text-foreground mb-4">{translate("cart.summary", "Order Summary")}</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-foreground/50">
-                  <span>Subtotal</span>
+                  <span>{translate("cart.subtotal", "Subtotal")}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-gold font-medium">
-                    <span>Discount</span>
+                    <span>{translate("cart.discount", "Discount")}</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-foreground/50">
-                  <span>Shipping</span>
+                  <span>{translate("cart.shipping", "Shipping")}</span>
                   <span className={shipping === 0 ? "text-emerald-400" : ""}>
-                    {shipping === 0 ? "FREE" : formatPrice(shipping)}
+                    {shipping === 0 ? translate("cart.free", "FREE") : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between text-foreground/50">
-                  <span>Tax (3%)</span>
+                  <span>{translate("cart.tax", "Tax (3%)")}</span>
                   <span>{formatPrice(tax)}</span>
                 </div>
                 <Separator className="bg-gold/10 my-2" />
                 <div className="flex justify-between font-bold text-lg">
-                  <span>Total</span>
+                  <span>{translate("cart.total", "Total")}</span>
                   <span className="gradient-gold-text">{formatPrice(total)}</span>
                 </div>
               </div>

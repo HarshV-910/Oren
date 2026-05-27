@@ -27,6 +27,7 @@ import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLocaleStore } from "@/store/useLocaleStore";
 import { toast } from "sonner";
+import { translate } from "@/lib/translations";
 
 
 const navLinks = [
@@ -118,7 +119,14 @@ export default function Navbar() {
                     href={link.href}
                     className="flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-gold transition-colors tracking-wide uppercase"
                   >
-                    {link.name}
+                    {translate(
+                      link.name === "Home" ? "nav.home" :
+                      link.name === "Collections" ? "nav.products" :
+                      link.name === "New Arrivals" ? "nav.new_arrivals" :
+                      link.name === "About" ? "nav.about" :
+                      link.name === "Contact" ? "nav.contact" : link.name,
+                      link.name
+                    )}
                     {link.submenu && (
                       <ChevronDown className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-300" />
                     )}
@@ -339,7 +347,14 @@ export default function Navbar() {
                         onClick={() => setMobileMenu(false)}
                         className="block py-3 px-4 text-foreground/80 hover:text-gold hover:bg-gold/5 rounded-lg transition-all text-lg"
                       >
-                        {link.name}
+                        {translate(
+                          link.name === "Home" ? "nav.home" :
+                          link.name === "Collections" ? "nav.products" :
+                          link.name === "New Arrivals" ? "nav.new_arrivals" :
+                          link.name === "About" ? "nav.about" :
+                          link.name === "Contact" ? "nav.contact" : link.name,
+                          link.name
+                        )}
                       </Link>
                       {link.submenu && (
                         <div className="pl-6 space-y-1">

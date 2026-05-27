@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { translate } from "@/lib/translations";
 import { useState } from "react";
 import { useCouponStore } from "@/store/useCouponStore";
 
@@ -59,7 +60,7 @@ export default function CartPage() {
             <ShoppingBag className="w-10 h-10 text-gold/40" />
           </div>
           <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-            Your cart is empty
+            {translate("cart.empty", "Your cart is empty")}
           </h1>
           <p className="text-foreground/40 mb-8">
             Discover our exquisite collection and add something beautiful
@@ -81,7 +82,7 @@ export default function CartPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl lg:text-4xl font-display font-bold gradient-gold-text mb-10"
         >
-          Shopping Cart
+          {translate("cart.title", "Shopping Cart")}
         </motion.h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -188,7 +189,7 @@ export default function CartPage() {
           >
             <div className="glass-card rounded-2xl p-6 lg:p-8 sticky top-32">
               <h2 className="text-lg font-display font-semibold text-foreground mb-6">
-                Order Summary
+                {translate("cart.summary", "Order Summary")}
               </h2>
 
                {/* Coupon */}
@@ -213,7 +214,7 @@ export default function CartPage() {
               ) : (
                 <div className="flex gap-2 mb-6">
                   <Input
-                    placeholder="Coupon code"
+                    placeholder={translate("cart.coupon_placeholder", "Coupon code")}
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value)}
                     className="bg-white/5 border-gold/15 focus:border-gold/40 text-sm"
@@ -238,30 +239,30 @@ export default function CartPage() {
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-foreground/50">
-                  <span>Subtotal</span>
+                  <span>{translate("cart.subtotal", "Subtotal")}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-gold font-medium">
-                    <span>Discount</span>
+                    <span>{translate("cart.discount", "Discount")}</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-foreground/50">
-                  <span>Shipping</span>
+                  <span>{translate("cart.shipping", "Shipping")}</span>
                   <span className={shipping === 0 ? "text-emerald-400" : ""}>
-                    {shipping === 0 ? "FREE" : formatPrice(shipping)}
+                    {shipping === 0 ? translate("cart.free", "FREE") : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between text-foreground/50">
-                  <span>Tax (GST 3%)</span>
+                  <span>{translate("cart.tax", "Tax (GST 3%)")}</span>
                   <span>{formatPrice(tax)}</span>
                 </div>
 
                 <Separator className="bg-gold/10" />
 
                 <div className="flex justify-between text-lg font-bold">
-                  <span className="text-foreground">Total</span>
+                  <span className="text-foreground">{translate("cart.total", "Total")}</span>
                   <span className="gradient-gold-text">
                     {formatPrice(finalTotal)}
                   </span>
@@ -272,7 +273,7 @@ export default function CartPage() {
                 href="/checkout"
                 className="w-full btn-luxury py-4 rounded-xl text-sm font-semibold uppercase tracking-wider flex items-center justify-center gap-2 mt-6 group"
               >
-                Proceed to Checkout
+                {translate("cart.checkout_btn", "Proceed to Checkout")}
                 <ArrowRight
                   size={16}
                   className="group-hover:translate-x-1 transition-transform"
