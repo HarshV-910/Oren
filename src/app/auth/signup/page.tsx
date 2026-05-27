@@ -20,6 +20,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "@/lib/firebase";
+import { useVisitorStore } from "@/store/useVisitorStore";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -28,6 +29,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const registerUser = useVisitorStore((s) => s.registerUser);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +50,7 @@ export default function SignupPage() {
           displayName: fullName,
         });
       }
+      registerUser(fullName, email);
       toast.success("Account created!", {
         description: "Welcome to the world of Oren luxury",
       });
@@ -64,7 +67,10 @@ export default function SignupPage() {
 
   const handleGoogleSignup = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const res = await signInWithPopup(auth, googleProvider);
+      if (res.user) {
+        registerUser(res.user.displayName || "", res.user.email || "");
+      }
       toast.success("Welcome to Oren!", {
         description: "Signed up with Google",
       });

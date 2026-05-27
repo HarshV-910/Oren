@@ -19,6 +19,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from "@/lib/firebase";
+import { useVisitorStore } from "@/store/useVisitorStore";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"email" | "phone">("email");
@@ -28,11 +29,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const registerUser = useVisitorStore((s) => s.registerUser);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      if (res.user) {
+        registerUser(res.user.displayName || "", res.user.email || "");
+      }
       toast.success("Welcome back!", { description: "Signed in successfully" });
       const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
       window.location.href = redirectUrl;
@@ -47,7 +53,10 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const res = await signInWithPopup(auth, googleProvider);
+      if (res.user) {
+        registerUser(res.user.displayName || "", res.user.email || "");
+      }
       toast.success("Welcome!", { description: "Signed in with Google" });
       const redirectUrl = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
       window.location.href = redirectUrl;

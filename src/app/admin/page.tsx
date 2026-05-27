@@ -15,17 +15,25 @@ import {
   ArrowUpRight,
   DollarSign,
 } from "lucide-react";
+import { useState } from "react";
 import { sampleProducts, formatPrice } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/store/useOrderStore";
+import { useVisitorStore } from "@/store/useVisitorStore";
 
 export default function AdminDashboard() {
   const orders = useOrderStore((s) => s.orders);
+  const { totalVisits, registeredUsers } = useVisitorStore();
+  const [viewType, setViewType] = useState<"weekly" | "monthly" | "yearly">("weekly");
 
   // Compute dynamic stats
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
   const totalOrders = orders.length;
   const activeProductsCount = sampleProducts.length;
+
+  const visitorGrowth = registeredUsers.length > 3 
+    ? `+${Math.round(((registeredUsers.length - 3) / 3) * 100)}%` 
+    : "0%";
 
   const stats = [
     {
@@ -51,14 +59,70 @@ export default function AdminDashboard() {
     },
     {
       label: "Total Visitors",
-      value: "0",
-      change: "0%",
+      value: totalVisits.toString(),
+      change: visitorGrowth,
       icon: Eye,
       color: "text-purple-400",
     },
   ];
 
   const recentOrders = orders.slice(0, 5);
+
+  // Compute chart labels and values based on viewType
+  let chartLabels: string[] = [];
+  let chartValues: number[] = [];
+
+  if (viewType === "weekly") {
+    chartLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    chartValues = [0, 0, 0, 0, 0, 0, 0];
+    orders.forEach((order) => {
+      try {
+        const date = new Date(order.date);
+        const day = date.getDay(); // 0 is Sunday, 1 is Monday...
+        const index = day === 0 ? 6 : day - 1; // Map Sunday to 6, Monday to 0...
+        if (index >= 0 && index < 7) {
+          chartValues[index] += order.total;
+        }
+      } catch (e) {}
+    });
+  } else if (viewType === "monthly") {
+    chartLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    chartValues = Array(12).fill(0);
+    orders.forEach((order) => {
+      try {
+        const date = new Date(order.date);
+        const month = date.getMonth();
+        if (month >= 0 && month < 12) {
+          chartValues[month] += order.total;
+        }
+      } catch (e) {}
+    });
+  } else {
+    chartLabels = ["2024", "2025", "2026", "2027"];
+    chartValues = Array(4).fill(0);
+    orders.forEach((order) => {
+      try {
+        const date = new Date(order.date);
+        const year = date.getFullYear().toString();
+        const index = chartLabels.indexOf(year);
+        if (index !== -1) {
+          chartValues[index] += order.total;
+        }
+      } catch (e) {}
+    });
+  }
+
+  // Fallback visual data if there is no revenue recorded yet
+  const hasRealRevenue = orders.some((o) => o.total > 0);
+  const sampleWeekly = [45000, 80000, 35000, 95000, 60000, 120000, 50000];
+  const sampleMonthly = [120000, 150000, 180000, 220000, 310000, 450000, 280000, 350000, 420000, 380000, 490000, 600000];
+  const sampleYearly = [850000, 1400000, 2800000, 0];
+
+  const displayValues = hasRealRevenue
+    ? chartValues
+    : (viewType === "weekly" ? sampleWeekly : (viewType === "monthly" ? sampleMonthly : sampleYearly));
+
+  const maxVal = Math.max(...displayValues, 1);
 
   return (
     <div>
@@ -102,7 +166,7 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Charts Placeholder */}
+      {/* Charts Block */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,25 +178,54 @@ export default function AdminDashboard() {
             Revenue Overview
           </h2>
           <div className="flex items-center gap-2">
-            <button className="text-xs px-3 py-1.5 rounded-lg bg-gold/10 text-gold">Weekly</button>
-            <button className="text-xs px-3 py-1.5 rounded-lg text-foreground/40 hover:bg-gold/5">Monthly</button>
-            <button className="text-xs px-3 py-1.5 rounded-lg text-foreground/40 hover:bg-gold/5">Yearly</button>
+            <button
+              onClick={() => setViewType("weekly")}
+              className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                viewType === "weekly" ? "bg-gold/10 text-gold" : "text-foreground/40 hover:bg-gold/5"
+              }`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => setViewType("monthly")}
+              className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                viewType === "monthly" ? "bg-gold/10 text-gold" : "text-foreground/40 hover:bg-gold/5"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setViewType("yearly")}
+              className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                viewType === "yearly" ? "bg-gold/10 text-gold" : "text-foreground/40 hover:bg-gold/5"
+              }`}
+            >
+              Yearly
+            </button>
           </div>
         </div>
 
-        {/* Simple Bar Chart */}
-        <div className="flex items-end justify-between gap-2 h-48">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => {
-            const heights = [65, 80, 45, 90, 75, 100, 55];
+        {/* Dynamic Bar Chart with Tooltips */}
+        <div className="flex items-end justify-between gap-2 h-48 pt-6">
+          {chartLabels.map((label, i) => {
+            const val = displayValues[i];
+            const heightPercent = (val / maxVal) * 100;
             return (
-              <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${heights[i]}%` }}
-                  transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
-                  className="w-full rounded-t-lg bg-gradient-to-t from-gold/20 to-gold/50 hover:from-gold/30 hover:to-gold/70 transition-all cursor-pointer"
-                />
-                <span className="text-[10px] text-foreground/30">{day}</span>
+              <div key={label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div className="relative group w-full flex justify-center items-end h-[calc(100%-20px)]">
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-stone-900 border border-gold/30 text-gold text-[10px] font-mono py-1.5 px-3 rounded-lg whitespace-nowrap shadow-2xl z-10 transition-all">
+                    {formatPrice(val)}
+                  </div>
+                  {/* Interactive Bar */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${Math.max(heightPercent, 3)}%` }} // Minimum height so it is visible
+                    transition={{ delay: 0.1 + i * 0.03, duration: 0.5 }}
+                    className="w-4 sm:w-8 md:w-12 rounded-t-lg bg-gradient-to-t from-gold/10 to-gold/60 hover:from-gold/25 hover:to-gold/80 transition-all cursor-pointer shadow-lg shadow-gold/5"
+                  />
+                </div>
+                <span className="text-[10px] text-foreground/30 font-medium tracking-wide mt-1">{label}</span>
               </div>
             );
           })}

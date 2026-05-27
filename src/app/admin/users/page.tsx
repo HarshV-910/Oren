@@ -7,6 +7,7 @@
 import { Users, Mail, Phone, Calendar } from "lucide-react";
 import { useOrderStore } from "@/store/useOrderStore";
 import { formatPrice } from "@/lib/data";
+import { useVisitorStore } from "@/store/useVisitorStore";
 
 interface Customer {
   id: string;
@@ -20,23 +21,52 @@ interface Customer {
 
 export default function AdminUsersPage() {
   const orders = useOrderStore((s) => s.orders);
+  const registeredUsers = useVisitorStore((s) => s.registeredUsers);
 
   // Group orders by client to build a dynamic list
   const customersMap = new Map<string, Customer>();
 
+  // Initialize customersMap with all registered users/visitors
+  registeredUsers.forEach((user) => {
+    customersMap.set(user.email.toLowerCase(), {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: "Not provided",
+      totalOrders: 0,
+      totalSpent: 0,
+      joined: user.joined,
+    });
+  });
+
   // Integrate dynamic orders placed during user session
   orders.forEach((order) => {
-    const emailKey = order.address.fullName.toLowerCase().replace(/\s+/g, "") + "@orenclient.com";
-    if (customersMap.has(emailKey)) {
-      const existing = customersMap.get(emailKey)!;
+    // If order has an email/fullName matching registered, map to it, otherwise fallback to guest
+    const guestEmail = order.address.fullName.toLowerCase().replace(/\s+/g, "") + "@orenclient.com";
+    const emailKey = guestEmail.toLowerCase();
+    
+    // Check if customer email exists in map (or look up by exact name match)
+    let matchedKey = "";
+    for (const [key, cust] of customersMap.entries()) {
+      if (cust.name.toLowerCase() === order.address.fullName.toLowerCase()) {
+        matchedKey = key;
+        break;
+      }
+    }
+
+    if (matchedKey) {
+      const existing = customersMap.get(matchedKey)!;
       existing.totalOrders += 1;
       existing.totalSpent += order.total;
+      if (order.address.phone) {
+        existing.phone = order.address.phone;
+      }
     } else {
       customersMap.set(emailKey, {
         id: `cust-${Math.random().toString(36).substr(2, 5)}`,
         name: order.address.fullName,
         email: emailKey,
-        phone: order.address.phone,
+        phone: order.address.phone || "Not provided",
         totalOrders: 1,
         totalSpent: order.total,
         joined: order.date,
