@@ -22,12 +22,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useState } from "react";
+import { useCouponStore } from "@/store/useCouponStore";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
-  const total = getTotal();
-  const shipping = total > 50000 ? 0 : 500;
-  const tax = Math.round(total * 0.03);
+  const { appliedCoupon, applyCoupon, removeCoupon } = useCouponStore();
+  const [couponInput, setCouponInput] = useState("");
+
+  const subtotal = getTotal();
+  const shipping = subtotal > 50000 ? 0 : 500;
+
+  // Calculate discount
+  let discount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === "percentage") {
+      discount = Math.round(subtotal * (appliedCoupon.value / 100));
+    } else {
+      discount = appliedCoupon.value;
+    }
+  }
+
+  const discountedSubtotal = Math.max(0, subtotal - discount);
+  const tax = Math.round(discountedSubtotal * 0.03);
+  const finalTotal = discountedSubtotal + shipping + tax;
 
   if (items.length === 0) {
     return (
@@ -173,25 +191,62 @@ export default function CartPage() {
                 Order Summary
               </h2>
 
-              {/* Coupon */}
-              <div className="flex gap-2 mb-6">
-                <Input
-                  placeholder="Coupon code"
-                  className="bg-white/5 border-gold/15 focus:border-gold/40 text-sm"
-                />
-                <Button
-                  variant="outline"
-                  className="border-gold/20 text-gold hover:bg-gold/10 shrink-0 px-4"
-                >
-                  <Tag size={14} />
-                </Button>
-              </div>
+               {/* Coupon */}
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between bg-gold/10 border border-gold/20 rounded-xl p-3 mb-6">
+                  <div className="text-xs">
+                    <span className="font-bold text-gold font-mono">{appliedCoupon.code}</span> Applied
+                    <p className="text-[10px] text-foreground/40 mt-0.5">
+                      {appliedCoupon.type === "percentage" ? `${appliedCoupon.value}%` : `₹${appliedCoupon.value}`} discount
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      removeCoupon();
+                      toast.success("Coupon code removed");
+                    }}
+                    className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2 mb-6">
+                  <Input
+                    placeholder="Coupon code"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    className="bg-white/5 border-gold/15 focus:border-gold/40 text-sm"
+                  />
+                  <Button
+                    onClick={() => {
+                      const res = applyCoupon(couponInput, subtotal);
+                      if (res.success) {
+                        toast.success(res.message);
+                        setCouponInput("");
+                      } else {
+                        toast.error(res.message);
+                      }
+                    }}
+                    variant="outline"
+                    className="border-gold/20 text-gold hover:bg-gold/10 shrink-0 px-4"
+                  >
+                    <Tag size={14} />
+                  </Button>
+                </div>
+              )}
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-foreground/50">
                   <span>Subtotal</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-gold font-medium">
+                    <span>Discount</span>
+                    <span>-{formatPrice(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-foreground/50">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-emerald-400" : ""}>
@@ -208,7 +263,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-foreground">Total</span>
                   <span className="gradient-gold-text">
-                    {formatPrice(total + shipping + tax)}
+                    {formatPrice(finalTotal)}
                   </span>
                 </div>
               </div>

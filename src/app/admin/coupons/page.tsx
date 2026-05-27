@@ -9,18 +9,10 @@ import { Tag, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-
-interface Coupon {
-  id: string;
-  code: string;
-  type: "percentage" | "flat";
-  value: number;
-  minSpend: number;
-  expiry: string;
-}
+import { useCouponStore, Coupon } from "@/store/useCouponStore";
 
 export default function AdminCouponsPage() {
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const { coupons, addCoupon, deleteCoupon } = useCouponStore();
 
   const [code, setCode] = useState("");
   const [type, setType] = useState<"percentage" | "flat">("percentage");
@@ -46,7 +38,7 @@ export default function AdminCouponsPage() {
       expiry,
     };
 
-    setCoupons([...coupons, newCoupon]);
+    addCoupon(newCoupon);
     setCode("");
     setValue(0);
     setMinSpend(0);
@@ -55,7 +47,7 @@ export default function AdminCouponsPage() {
   };
 
   const handleDelete = (id: string) => {
-    setCoupons(coupons.filter((c) => c.id !== id));
+    deleteCoupon(id);
     toast.success("Coupon code deleted successfully");
   };
 
@@ -128,11 +120,10 @@ export default function AdminCouponsPage() {
               <div>
                 <label className="text-xs text-foreground/50 uppercase tracking-wider">Expiry Date</label>
                 <Input
-                  type="text"
+                  type="date"
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value)}
-                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
-                  placeholder="Dec 31, 2026"
+                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40 text-foreground"
                   required
                 />
               </div>

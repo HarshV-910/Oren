@@ -236,7 +236,7 @@ export async function POST(request: Request) {
     // NOTE: On Resend's free tier without a verified domain, 'from' must be "onboarding@resend.dev"
     // and 'to' must be your account owner email (usually the email you signed up with).
     // Once you verify your domain, you can change 'from' to your verified sender (e.g., "orders@yourdomain.com").
-    const fromSender = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromSender = process.env.RESEND_FROM_EMAIL || "orders@striker4u.me";
 
     const { data, error } = await resend.emails.send({
       from: `OREN Luxury <${fromSender}>`,

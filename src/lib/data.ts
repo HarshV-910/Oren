@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════
 
 import type { Product, Category, Banner, Review } from "@/types";
+import { useLocaleStore } from "@/store/useLocaleStore";
 
 export const sampleCategories: Category[] = [
   {
@@ -475,12 +476,35 @@ export const testimonials = [
   },
 ];
 
-export function formatPrice(price: number, currency = "INR"): string {
-  return new Intl.NumberFormat("en-IN", {
+export function formatPrice(price: number, currency?: string): string {
+  let activeCurrency = "INR";
+  let activeRates: Record<string, number> = { INR: 1.0, USD: 0.012, EUR: 0.011, AED: 0.044 };
+
+  try {
+    const state = useLocaleStore.getState();
+    if (state) {
+      activeCurrency = currency || state.currency;
+      activeRates = state.exchangeRates;
+    }
+  } catch (e) {
+    if (currency) activeCurrency = currency;
+  }
+
+  let displayPrice = price;
+  if (!currency && activeCurrency !== "INR") {
+    displayPrice = Math.round(price * (activeRates[activeCurrency] || 1.0));
+  }
+
+  let locale = "en-IN";
+  if (activeCurrency === "USD") locale = "en-US";
+  else if (activeCurrency === "EUR") locale = "en-IE";
+  else if (activeCurrency === "AED") locale = "en-AE";
+
+  return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: currency,
+    currency: activeCurrency,
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(displayPrice);
 }
 
 export function getDiscountPercentage(price: number, comparePrice: number): number {

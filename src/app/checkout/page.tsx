@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useCouponStore } from "@/store/useCouponStore";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useOrderStore, type OrderLocal } from "@/store/useOrderStore";
@@ -53,15 +54,29 @@ export default function CheckoutPage() {
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("India");
 
+  const { appliedCoupon, removeCoupon } = useCouponStore();
+
   const subtotal = getTotal();
   const shipping = subtotal > 50000 ? 0 : 500;
-  const tax = Math.round(subtotal * 0.03);
-  const total = subtotal + shipping + tax;
+
+  // Calculate discount
+  let discount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === "percentage") {
+      discount = Math.round(subtotal * (appliedCoupon.value / 100));
+    } else {
+      discount = appliedCoupon.value;
+    }
+  }
+
+  const discountedSubtotal = Math.max(0, subtotal - discount);
+  const tax = Math.round(discountedSubtotal * 0.03);
+  const total = discountedSubtotal + shipping + tax;
 
   const handlePlaceOrder = async () => {
     const order = addOrder({
       items,
-      subtotal,
+      subtotal: discountedSubtotal,
       tax,
       shipping,
       total,
@@ -92,7 +107,7 @@ export default function CheckoutPage() {
             price: item.product?.price || 0,
             size: item.size || "Standard",
           })),
-          subtotal,
+          subtotal: discountedSubtotal,
           tax,
           shipping,
           total,
@@ -109,6 +124,7 @@ export default function CheckoutPage() {
     });
     setPlacedOrder(order);
     clearCart();
+    removeCoupon();
     setStep(4);
   };
 
@@ -621,9 +637,15 @@ export default function CheckoutPage() {
               <h3 className="text-sm font-semibold text-foreground mb-4">Order Summary</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-foreground/50">
-                  <span>Items ({items.length})</span>
+                  <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-gold font-medium">
+                    <span>Discount</span>
+                    <span>-{formatPrice(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-foreground/50">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-emerald-400" : ""}>

@@ -23,9 +23,10 @@ import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
-
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useLocaleStore } from "@/store/useLocaleStore";
+import { toast } from "sonner";
 
 
 const navLinks = [
@@ -50,6 +51,9 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [localeOpen, setLocaleOpen] = useState(false);
+  const { language, currency, setLanguage, setCurrency } = useLocaleStore();
+
   const { isMobileMenuOpen, setMobileMenu, setSearchOpen, setChatOpen } = useUIStore();
   const cartCount = useCartStore((s) => s.getItemCount());
   const wishlistCount = useWishlistStore((s) => s.items.length);
@@ -211,12 +215,86 @@ export default function Navbar() {
                 <User size={20} />
               </Link>
 
-              <button
-                className="hidden md:flex p-2 text-foreground/70 hover:text-gold transition-colors"
-                aria-label="Language"
-              >
-                <Globe size={18} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setLocaleOpen(!localeOpen)}
+                  className="hidden md:flex p-2 text-foreground/70 hover:text-gold transition-colors"
+                  aria-label="Language and Currency"
+                >
+                  <Globe size={18} />
+                </button>
+                
+                <AnimatePresence>
+                  {localeOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-2 w-64 glass-strong rounded-xl p-4 shadow-2xl z-50 space-y-4 border border-gold/15"
+                    >
+                      <div>
+                        <label className="text-[10px] text-foreground/40 uppercase tracking-wider block mb-2 font-semibold">
+                          Select Currency
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { code: "INR", label: "INR (₹)" },
+                            { code: "USD", label: "USD ($)" },
+                            { code: "EUR", label: "EUR (€)" },
+                            { code: "AED", label: "AED (د.إ)" },
+                          ].map((curr) => (
+                            <button
+                              key={curr.code}
+                              onClick={() => {
+                                setCurrency(curr.code as any);
+                                toast.success(`Currency switched to ${curr.code}`);
+                                setLocaleOpen(false);
+                              }}
+                              className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border text-center transition-all ${
+                                currency === curr.code
+                                  ? "bg-gold/10 border-gold text-gold"
+                                  : "bg-white/5 border-transparent text-foreground/70 hover:bg-white/10"
+                              }`}
+                            >
+                              {curr.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border-t border-gold/10 pt-3">
+                        <label className="text-[10px] text-foreground/40 uppercase tracking-wider block mb-2 font-semibold">
+                          Select Language
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { code: "en", label: "English" },
+                            { code: "hi", label: "Hindi" },
+                            { code: "ar", label: "Arabic" },
+                            { code: "es", label: "Spanish" },
+                          ].map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                setLanguage(lang.code as any);
+                                toast.success(`Language changed to ${lang.label}`);
+                                setLocaleOpen(false);
+                              }}
+                              className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border text-center transition-all ${
+                                language === lang.code
+                                  ? "bg-gold/10 border-gold text-gold"
+                                  : "bg-white/5 border-transparent text-foreground/70 hover:bg-white/10"
+                              }`}
+                            >
+                              {lang.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
