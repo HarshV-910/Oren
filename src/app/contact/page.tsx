@@ -23,28 +23,41 @@ import { toast } from "sonner";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function ContactPage() {
-  const { storeName, contactEmail, phone, address } = useSettingsStore();
+  const {
+    storeName,
+    contactEmail,
+    phone,
+    address,
+    addressState,
+    phoneBackup,
+    phoneTollFree,
+    supportEmail,
+    ordersEmail,
+    workingHoursWeekdays,
+    workingHoursSunday,
+    workingHoursHolidays,
+  } = useSettingsStore();
 
   const contactInfo = [
     {
       icon: MapPin,
       title: "Visit Us",
-      details: [`${storeName} Luxury Jewellers`, address, "Maharashtra, India 400002"],
+      details: [`${storeName} Luxury Jewellers`, address, addressState],
     },
     {
       icon: Phone,
       title: "Call Us",
-      details: [phone, "+91 22 2567 8901", "Toll Free: 1800-XXX-XXXX"],
+      details: [phone, phoneBackup, phoneTollFree],
     },
     {
       icon: Mail,
       title: "Email Us",
-      details: [contactEmail, `support@${storeName.toLowerCase().replace(/\s+/g, '')}.com`, `orders@${storeName.toLowerCase().replace(/\s+/g, '')}.com`],
+      details: [contactEmail, supportEmail, ordersEmail],
     },
     {
       icon: Clock,
       title: "Working Hours",
-      details: ["Mon - Sat: 10AM - 8PM", "Sunday: 11AM - 6PM", "Holidays: Closed"],
+      details: [workingHoursWeekdays, workingHoursSunday, workingHoursHolidays],
     },
   ];
 
@@ -216,8 +229,11 @@ export default function ContactPage() {
                   <Headphones className="w-6 h-6 text-luxury-black" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-display font-semibold text-foreground">
+                  <h3 className="text-lg font-display font-semibold text-foreground flex items-center gap-2">
                     Live Support
+                    <span className="text-[9px] font-sans font-bold bg-gold/10 text-gold border border-gold/20 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      Upcoming
+                    </span>
                   </h3>
                   <p className="text-xs text-foreground/40">Available during working hours</p>
                 </div>

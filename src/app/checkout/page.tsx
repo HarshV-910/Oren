@@ -4,7 +4,7 @@
 // OREN — Checkout Page
 // ═══════════════════════════════════════════════════════
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   CreditCard,
@@ -32,9 +32,16 @@ export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "razorpay" | "cod">("stripe");
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
   const addOrder = useOrderStore((s) => s.addOrder);
   const [placedOrder, setPlacedOrder] = useState<OrderLocal | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      if (user.full_name) setFullName(user.full_name);
+      if (user.phone) setPhone(user.phone);
+    }
+  }, [user]);
   const { storeName, contactEmail, phone: storePhone } = useSettingsStore();
 
   // Shipping Address States
@@ -51,7 +58,7 @@ export default function CheckoutPage() {
   const tax = Math.round(subtotal * 0.03);
   const total = subtotal + shipping + tax;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     const order = addOrder({
       items,
       subtotal,
@@ -69,6 +76,33 @@ export default function CheckoutPage() {
         country,
       },
     });
+
+    // Dispatch Order Details Email Confirmation asynchronously
+    try {
+      fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user?.email || "harshvekariya910@gmail.com",
+          orderNumber: order.order_number,
+          fullName,
+          items: items.map((item) => ({
+            name: item.product?.name || "Premium Jeweller Item",
+            quantity: item.quantity,
+            price: item.product?.price || 0,
+            size: item.size || "Standard",
+          })),
+          subtotal,
+          tax,
+          shipping,
+          total,
+          paymentMethod,
+          address: `${addressLine}, ${city}, ${state} - ${postalCode}, ${country}`,
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to queue order email sending:", e);
+    }
 
     toast.success("Order placed successfully! 🎉", {
       description: `Order ${order.order_number} total: ${formatPrice(total)}`,

@@ -5,11 +5,12 @@
 // ═══════════════════════════════════════════════════════
 
 import { useState, useEffect } from "react";
-import { Settings, Save, ShieldAlert, Globe, Bell } from "lucide-react";
+import { Settings, Save, ShieldAlert, Globe, Bell, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import Link from "next/link";
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 import { useGuideStore } from "@/store/useGuideStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -19,16 +20,43 @@ export default function AdminSettingsPage() {
     storeName: initialStoreName,
     contactEmail: initialContactEmail,
     phone: initialPhone,
+    address: initialAddress,
     maintenance: initialMaintenance,
+    addressState: initialAddressState,
+    phoneBackup: initialPhoneBackup,
+    phoneTollFree: initialPhoneTollFree,
+    supportEmail: initialSupportEmail,
+    ordersEmail: initialOrdersEmail,
+    workingHoursWeekdays: initialWorkingHoursWeekdays,
+    workingHoursSunday: initialWorkingHoursSunday,
+    workingHoursHolidays: initialWorkingHoursHolidays,
     setStoreName: updateStoreName,
     setContactEmail: updateContactEmail,
     setPhone: updatePhone,
+    setAddress: updateAddress,
     setMaintenance: updateMaintenance,
+    setAddressState: updateAddressState,
+    setPhoneBackup: updatePhoneBackup,
+    setPhoneTollFree: updatePhoneTollFree,
+    setSupportEmail: updateSupportEmail,
+    setOrdersEmail: updateOrdersEmail,
+    setWorkingHoursWeekdays: updateWorkingHoursWeekdays,
+    setWorkingHoursSunday: updateWorkingHoursSunday,
+    setWorkingHoursHolidays: updateWorkingHoursHolidays,
   } = useSettingsStore();
 
   const [storeName, setStoreName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [addressState, setAddressState] = useState("");
+  const [phoneBackup, setPhoneBackup] = useState("");
+  const [phoneTollFree, setPhoneTollFree] = useState("");
+  const [supportEmail, setSupportEmail] = useState("");
+  const [ordersEmail, setOrdersEmail] = useState("");
+  const [workingHoursWeekdays, setWorkingHoursWeekdays] = useState("");
+  const [workingHoursSunday, setWorkingHoursSunday] = useState("");
+  const [workingHoursHolidays, setWorkingHoursHolidays] = useState("");
   const [maintenance, setMaintenance] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -48,11 +76,37 @@ export default function AdminSettingsPage() {
     setStoreName(initialStoreName);
     setContactEmail(initialContactEmail);
     setPhone(initialPhone);
+    setAddress(initialAddress);
+    setAddressState(initialAddressState);
+    setPhoneBackup(initialPhoneBackup);
+    setPhoneTollFree(initialPhoneTollFree);
+    setSupportEmail(initialSupportEmail);
+    setOrdersEmail(initialOrdersEmail);
+    setWorkingHoursWeekdays(initialWorkingHoursWeekdays);
+    setWorkingHoursSunday(initialWorkingHoursSunday);
+    setWorkingHoursHolidays(initialWorkingHoursHolidays);
     setMaintenance(initialMaintenance);
     setAnnouncementText(storeAnnouncement);
     setSizeGuideText(storeSizeGuide);
     setCareGuideText(storeCareGuide);
-  }, [initialStoreName, initialContactEmail, initialPhone, initialMaintenance, storeAnnouncement, storeSizeGuide, storeCareGuide]);
+  }, [
+    initialStoreName,
+    initialContactEmail,
+    initialPhone,
+    initialAddress,
+    initialAddressState,
+    initialPhoneBackup,
+    initialPhoneTollFree,
+    initialSupportEmail,
+    initialOrdersEmail,
+    initialWorkingHoursWeekdays,
+    initialWorkingHoursSunday,
+    initialWorkingHoursHolidays,
+    initialMaintenance,
+    storeAnnouncement,
+    storeSizeGuide,
+    storeCareGuide,
+  ]);
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +115,15 @@ export default function AdminSettingsPage() {
       updateStoreName(storeName);
       updateContactEmail(contactEmail);
       updatePhone(phone);
+      updateAddress(address);
+      updateAddressState(addressState);
+      updatePhoneBackup(phoneBackup);
+      updatePhoneTollFree(phoneTollFree);
+      updateSupportEmail(supportEmail);
+      updateOrdersEmail(ordersEmail);
+      updateWorkingHoursWeekdays(workingHoursWeekdays);
+      updateWorkingHoursSunday(workingHoursSunday);
+      updateWorkingHoursHolidays(workingHoursHolidays);
       updateMaintenance(maintenance);
       storeSetAnnouncement(announcementText);
       storeSetSizeGuide(sizeGuideText);
@@ -72,6 +135,16 @@ export default function AdminSettingsPage() {
 
   return (
     <div>
+      {/* Navigation */}
+      <div className="mb-6 flex justify-between items-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-xs text-foreground/45 hover:text-gold uppercase tracking-wider transition-colors font-medium"
+        >
+          <ArrowLeft size={14} /> Back to Storefront
+        </Link>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-display font-bold gradient-gold-text">
@@ -91,35 +164,130 @@ export default function AdminSettingsPage() {
             </h2>
 
             <form onSubmit={handleSaveSettings} className="space-y-4">
-              <div>
-                <label className="text-xs text-foreground/50 uppercase tracking-wider">Luxury Brand Name</label>
-                <Input
-                  value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
-                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Luxury Brand Name</label>
+                  <Input
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Primary Hello Email</label>
+                  <Input
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-xs text-foreground/50 uppercase tracking-wider">Support Contact Email</label>
-                <Input
-                  type="email"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Support Contact Email</label>
+                  <Input
+                    type="email"
+                    value={supportEmail}
+                    onChange={(e) => setSupportEmail(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Orders Support Email</label>
+                  <Input
+                    type="email"
+                    value={ordersEmail}
+                    onChange={(e) => setOrdersEmail(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-xs text-foreground/50 uppercase tracking-wider">Toll-free Support Line</label>
-                <Input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Primary Phone</label>
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Backup Phone</label>
+                  <Input
+                    value={phoneBackup}
+                    onChange={(e) => setPhoneBackup(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Toll-free Support Line</label>
+                  <Input
+                    value={phoneTollFree}
+                    onChange={(e) => setPhoneTollFree(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Store Street / City Address</label>
+                  <Input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Store Region / Zip Address</label>
+                  <Input
+                    value={addressState}
+                    onChange={(e) => setAddressState(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Working Hours (Weekdays)</label>
+                  <Input
+                    value={workingHoursWeekdays}
+                    onChange={(e) => setWorkingHoursWeekdays(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Working Hours (Sunday)</label>
+                  <Input
+                    value={workingHoursSunday}
+                    onChange={(e) => setWorkingHoursSunday(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">Working Hours (Holidays)</label>
+                  <Input
+                    value={workingHoursHolidays}
+                    onChange={(e) => setWorkingHoursHolidays(e.target.value)}
+                    className="mt-1.5 bg-white/5 border-gold/15 focus:border-gold/40"
+                    required
+                  />
+                </div>
               </div>
 
               <div>
