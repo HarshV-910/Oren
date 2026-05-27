@@ -23,7 +23,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { auth, onAuthStateChanged } from "@/lib/firebase";
+
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
@@ -63,28 +63,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "harshvekariya910@gmail.com";
-        setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email || "",
-          full_name: firebaseUser.displayName || "Valued Client",
-          phone: firebaseUser.phoneNumber || undefined,
-          avatar_url: firebaseUser.photoURL || undefined,
-          role: firebaseUser.email === adminEmail ? "admin" : "user",
-          language: "en",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      } else {
-        setUser(null);
-      }
-    });
 
-    return () => unsubscribe();
-  }, [setUser]);
 
   return (
     <>

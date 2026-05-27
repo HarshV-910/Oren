@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Crown } from "lucide-react";
+import { auth, onAuthStateChanged } from "@/lib/firebase";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -18,12 +19,35 @@ export default function MaintenanceGuard({ children }: { children: React.ReactNo
   const router = useRouter();
   const pathname = usePathname();
   const maintenance = useSettingsStore((s) => s.maintenance);
-  const { user, isLoading } = useAuthStore();
+  const { user, setUser, isLoading } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "harshvekariya910@gmail.com";
+        setUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || "",
+          full_name: firebaseUser.displayName || "Valued Client",
+          phone: firebaseUser.phoneNumber || undefined,
+          avatar_url: firebaseUser.photoURL || undefined,
+          role: firebaseUser.email === adminEmail ? "admin" : "user",
+          language: "en",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [setUser]);
 
   useEffect(() => {
     if (!mounted || isLoading) return;
